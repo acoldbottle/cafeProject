@@ -22,6 +22,8 @@ import cafeLogProject.cafeLog.common.exception.user.UserNotFoundException;
 import cafeLogProject.cafeLog.domains.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -43,6 +45,7 @@ public class ReviewService {
     private final ReviewImageRepository reviewImageRepository;
     private final CafeRepository cafeRepository;
 
+    @CacheEvict(value = "reviews", allEntries = true)
     @Transactional
     public ShowReviewResponse addReview(String username, Long draftReviewId, RegistReviewRequest registReviewRequest) {
         User user = userRepository.findByUsername(username).orElseThrow(() ->{
@@ -63,6 +66,7 @@ public class ReviewService {
                 .build();
     }
 
+    @CacheEvict(value = "reviews", allEntries = true)
     @Transactional
     public ShowReviewResponse updateReview(String username, long reviewId, UpdateReviewRequest updateReviewRequest) {
         Review oldReview = validateIdentityWithReview(username, reviewId);
@@ -74,6 +78,7 @@ public class ReviewService {
         return findReview(updatedReview.getId());
     }
 
+    @CacheEvict(value = "reviews", allEntries = true)
     @Transactional
     public void deleteReview(String username, long reviewId) {
         Review review = validateIdentityWithReview(username, reviewId);
@@ -96,6 +101,8 @@ public class ReviewService {
         }
     }
 
+    @Cacheable(value = "reviews", key = "'allReviews:timestamp:' + #request.getTimestamp()",
+            condition = "#request.getSort()=='NEW' and #request.getTagIds()==null and #request.getRating()==null")
     public List<ShowReviewResponse> findReviews(ShowReviewRequest request) {
         Pageable pageable = PageRequest.of(0, request.getLimit());
         return reviewRepository.search(request.getSort(), request.getTagIds(), request.getRating(), request.getTimestamp(), pageable);

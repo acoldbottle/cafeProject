@@ -85,6 +85,7 @@ public class JWTFilter extends OncePerRequestFilter {
 
     private boolean checkBlackList(HttpServletResponse response, String refreshToken) throws IOException {
         if (tokenService.isExistInBlacklist(refreshToken)) {
+            log.info("refreshToken = {}", refreshToken);
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.setContentType("application/json; charset=UTF-8");
             String json = String.format("{\"status\": %d, \"message\": \"%s\"}",

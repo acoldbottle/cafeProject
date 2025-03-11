@@ -171,12 +171,12 @@ public class FollowRepositoryImpl implements FollowRepositoryCustom {
     /**
      * 마지막 조회 결과를 레디스에 저장
      * 마지막으로 조회한 follow가 삭제되는 경우도 있기 때문
-     * 키는 현재유저아이디:타겟유저아이디 --> 유저마다 isFollow 값이 다르기 때문에
+     * 키는 현재유저아이디:타겟유저아이디:팔로워 or 팔로잉 --> 유저마다 isFollow 값이 다르기 때문에
      * 값은 마지막으로 조회한 followId:isFollow
      */
     private void cacheLastResult(Long lastResultFollowId, Long currentUserId, Long otherUserId, int isFollow, boolean isFollower) {
-        String listType = isFollower ? "-follower" : "-following";
-        String key = currentUserId + ":" + otherUserId + listType;
+        String listType = isFollower ? "follower" : "following";
+        String key = currentUserId + ":" + otherUserId + ":" + listType;
         String value = lastResultFollowId + ":" + isFollow;
         redisTemplate.opsForValue().set(key, value, 1, TimeUnit.HOURS);
     }
