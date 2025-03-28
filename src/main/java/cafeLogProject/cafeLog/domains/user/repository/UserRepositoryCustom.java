@@ -12,6 +12,7 @@ public interface UserRepositoryCustom {
     boolean existsNicknameExcludingSelf(String username, String newNickname);
     Optional<OtherUserInfoRes> findOtherUserInfo(String currentUsername, Long otherUserId);
     Optional<UserInfoRes> findMyProfileWithReviewCount(String username);
+    List<UserSearchRes> searchUserByNickname(String searchNickname, Long currentUserId, List<UserSearchRes> findUsers);
 
-    List<UserSearchRes> searchUserByNickname(String searchNickname, Long currentUserId);
+    List<UserSearchRes> findUsersByNickname(String searchNickname);
 }

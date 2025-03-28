@@ -77,28 +77,9 @@ public class UserRepositoryImpl implements UserRepositoryCustom{
         return Optional.ofNullable(reviewCnt);
     }
 
-    /**
-     *
-     * @param searchNickname 검색하려는 닉네임
-     * @param currentUserId 현재 로그인한 사용자
-     *
-     * searchList -> searchNickname을 자신의 닉네임에 포함하고 있는 유저들 리스트
-     * myFollowingList -> 현재 로그인한 사용자의 팔로잉 리스트
-     * mutualFollowers -> searchList로 나온 유저의 팔로워 리스트에도 존재하고 현재 로그인한 사용자의 팔로잉 리스트에도 존재하는 유저들 닉네임
-     * mutualFollowersMap -> mutualFollowers 정리
-     *                      => Map<searchList로 나온 유저 아이디, List<searchList로 나온 유저의 팔로워 리스트에도 존재하고 현재 로그인한 사용자의 팔로잉 리스트에도 존재하는 유저들 닉네임>>
-     *
-     * @method setIsFollow -> 현재 로그인한 사용자가 searchList로 나온 유저를 팔로잉 하고 있는지 여부
-     * @method setFollowerCountMessage -> mutualFollowersMap에서 나온 정보를 기반으로 사용자에게 적절한 메시지 설정
-     * @method sortSearchList -> searchList 정렬
-     *                          1) searchNickname 을 닉네임으로 가진 유저
-     *                          2) 겹치는 팔로우들의 수(=List<searchList로 나온 유저의 팔로워 리스트에도 존재하고 현재 로그인한 사용자의 팔로잉 리스트에도 존재하는 유저들 닉네임>.size())
-     *
-     */
     @Override
-    public List<UserSearchRes> searchUserByNickname(String searchNickname, Long currentUserId) {
-
-        List<UserSearchRes> searchList = queryFactory
+    public List<UserSearchRes> findUsersByNickname(String searchNickname) {
+        return queryFactory
                 .select(new QUserSearchRes(
                         user.id,
                         user.nickname,
@@ -107,6 +88,27 @@ public class UserRepositoryImpl implements UserRepositoryCustom{
                 .from(user)
                 .where(user.nickname.containsIgnoreCase(searchNickname))
                 .fetch();
+    }
+    /**
+     *
+     * @param searchNickname 검색하려는 닉네임
+     * @param currentUserId 현재 로그인한 사용자
+     *
+     * findUsers -> searchNickname을 자신의 닉네임에 포함하고 있는 유저들 리스트
+     * myFollowingList -> 현재 로그인한 사용자의 팔로잉 리스트
+     * mutualFollowers -> findUsers로 나온 유저의 팔로워 리스트에도 존재하고 현재 로그인한 사용자의 팔로잉 리스트에도 존재하는 유저들 닉네임
+     * mutualFollowersMap -> mutualFollowers 정리
+     *                      => Map<findUsers로 나온 유저 아이디, List<findUsers로 나온 유저의 팔로워 리스트에도 존재하고 현재 로그인한 사용자의 팔로잉 리스트에도 존재하는 유저들 닉네임>>
+     *
+     * @method setIsFollow -> 현재 로그인한 사용자가 findUsers로 나온 유저를 팔로잉 하고 있는지 여부
+     * @method setFollowerCountMessage -> mutualFollowersMap에서 나온 정보를 기반으로 사용자에게 적절한 메시지 설정
+     * @method sortSearchList -> findUsers 정렬
+     *                          1) searchNickname 을 닉네임으로 가진 유저
+     *                          2) 겹치는 팔로우들의 수(=List<findUsers로 나온 유저의 팔로워 리스트에도 존재하고 현재 로그인한 사용자의 팔로잉 리스트에도 존재하는 유저들 닉네임>.size())
+     *
+     */
+    @Override
+    public List<UserSearchRes> searchUserByNickname(String searchNickname, Long currentUserId, List<UserSearchRes> findUsers) {
 
         List<Long> myFollowingList = queryFactory
                 .select(follow.following.id)
@@ -134,14 +136,13 @@ public class UserRepositoryImpl implements UserRepositoryCustom{
         }
 
 
-        searchList.forEach(searchedUser -> {
+        findUsers.forEach(searchedUser -> {
             setIsFollow(currentUserId, searchedUser, myFollowingList);
             setFollowerCountMessage(searchedUser, mutualFollowersMap);
         });
 
-        sortSearchList(searchNickname, searchList, mutualFollowersMap);
-
-        return searchList
+        sortSearchList(searchNickname, findUsers, mutualFollowersMap);
+        return findUsers
                 .stream()
                 .limit(10)
                 .toList();
@@ -171,8 +172,8 @@ public class UserRepositoryImpl implements UserRepositoryCustom{
         }
     }
 
-    private void sortSearchList(String searchNickname, List<UserSearchRes> searchList, Map<Long, List<String>> mutualFollowersMap) {
-        Collections.sort(searchList, (user1, user2) -> {
+    private void sortSearchList(String searchNickname, List<UserSearchRes> findUsers, Map<Long, List<String>> mutualFollowersMap) {
+        Collections.sort(findUsers, (user1, user2) -> {
 
             boolean isUser1Matched = user1.getNickname().equalsIgnoreCase(searchNickname);
             boolean isUser2Matched = user2.getNickname().equalsIgnoreCase(searchNickname);

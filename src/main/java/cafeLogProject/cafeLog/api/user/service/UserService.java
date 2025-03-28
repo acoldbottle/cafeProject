@@ -1,10 +1,11 @@
 package cafeLogProject.cafeLog.api.user.service;
 
 import cafeLogProject.cafeLog.api.user.dto.*;
+import cafeLogProject.cafeLog.api.user.elasticsearch.NicknameDocument;
+import cafeLogProject.cafeLog.api.user.elasticsearch.NicknameDocumentRepository;
 import cafeLogProject.cafeLog.common.auth.jwt.JWTUserDTO;
 import cafeLogProject.cafeLog.common.exception.user.UserNicknameException;
 import cafeLogProject.cafeLog.common.exception.user.UserNotFoundException;
-import cafeLogProject.cafeLog.domains.review.repository.ReviewRepository;
 import cafeLogProject.cafeLog.domains.user.domain.User;
 import cafeLogProject.cafeLog.domains.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +25,7 @@ import static cafeLogProject.cafeLog.common.exception.ErrorCode.*;
 public class UserService {
 
     private final UserRepository userRepository;
-    private final ReviewRepository reviewRepository;
+    private final NicknameDocumentRepository nicknameDocumentRepository;
 
     public UserInfoRes getUserInfo(String username) {
 
@@ -42,7 +43,8 @@ public class UserService {
         user.updateUserNickname(userUpdateReq.getNickName());
         user.updateUserIntroduce(userUpdateReq.getIntroduce());
 
-        userRepository.save(user);
+        User updatedUser = userRepository.save(user);
+        nicknameDocumentRepository.save(NicknameDocument.from(updatedUser));
     }
 
     public IsExistNicknameRes isExistNickname(String username, String nickname) {
@@ -69,7 +71,9 @@ public class UserService {
         User user = userRepository.findByUsername(currentUsername)
                 .orElseThrow(() -> new UserNotFoundException(USER_NOT_FOUND_ERROR));
 
-        return userRepository.searchUserByNickname(searchNickname, user.getId());
+        List<UserSearchRes> findUsers = userRepository.findUsersByNickname(searchNickname);
+
+        return userRepository.searchUserByNickname(searchNickname, user.getId(), findUsers);
     }
 
     private void validateNickname(String userName, UserUpdateReq userUpdateReq) {

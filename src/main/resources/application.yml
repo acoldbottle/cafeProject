@@ -3,6 +3,9 @@ spring:
     restart:
       enabled: true
 
+  elasticsearch:
+    host: ${ELASTIC_SEARCH_HOST}
+
   datasource:
     url: ${DB_DATASOURCE}
     username: ${DB_USERNAME}
@@ -25,7 +28,6 @@ spring:
       hibernate:
         show_sql: true
 #        format_sql: true
-
   jwt:
     secret: ${JWT_SECRET}
 
@@ -67,6 +69,7 @@ spring:
               user-name-attribute: response
 
 logging.level:
+  tracer: warn
   org.hibernate.SQL: debug
   org.hibernate.orm.jdbc.bind: trace
 

@@ -1,0 +1,16 @@
+{
+  "properties": {
+    "id": {
+      "type": "long",
+      "index": false
+    },
+    "isProfileImageExist": {
+      "type": "boolean",
+      "index": false
+    },
+    "nickname": {
+      "type": "text",
+      "analyzer": "ngram_analyzer"
+    }
+  }
+}

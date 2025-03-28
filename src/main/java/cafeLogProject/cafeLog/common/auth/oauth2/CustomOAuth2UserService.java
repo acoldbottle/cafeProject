@@ -1,5 +1,7 @@
 package cafeLogProject.cafeLog.common.auth.oauth2;
 
+import cafeLogProject.cafeLog.api.user.elasticsearch.NicknameDocument;
+import cafeLogProject.cafeLog.api.user.elasticsearch.NicknameDocumentRepository;
 import cafeLogProject.cafeLog.common.auth.oauth2.provider.FacebookUser;
 import cafeLogProject.cafeLog.common.auth.oauth2.provider.NaverUser;
 import cafeLogProject.cafeLog.common.auth.exception.UserCreateException;
@@ -29,7 +31,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
     private final UserRepository userRepository;
     private final NicknameGenerator nicknameGenerator;
-
+    private final NicknameDocumentRepository nicknameDocumentRepository;
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
 
@@ -87,7 +89,8 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                                 .build();
 
                         newUser.setNicknameFirstLogin(nicknameGenerator.generateNickname());
-                        userRepository.save(newUser);
+                        User savedUser = userRepository.save(newUser);
+                        nicknameDocumentRepository.save(NicknameDocument.from(savedUser));
                         log.info("새로운 사용자 등록, username={}", user.getUsername());
                         return newUser;
                     } catch (Exception e) {

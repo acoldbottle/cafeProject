@@ -1,5 +1,6 @@
 package cafeLogProject.cafeLog.api.user.dto;
 
+import cafeLogProject.cafeLog.api.user.elasticsearch.NicknameDocument;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.querydsl.core.annotations.QueryProjection;
 import lombok.Data;
@@ -26,6 +27,14 @@ public class UserSearchRes {
         this.userId = userId;
         this.nickname = nickname;
         this.isProfileImageExist = isProfileImageExist;
+    }
+
+    public static UserSearchRes from(NicknameDocument nicknameDocument) {
+        return new UserSearchRes(
+                nicknameDocument.getId(),
+                nicknameDocument.getNickname(),
+                nicknameDocument.getIsProfileImageExist()
+        );
     }
 
 }
