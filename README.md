@@ -264,10 +264,10 @@
 <br>
 
 ## 📐 Architecture
-![Architecture](../imgs/github/cafe-project.png)
+<img width="914" alt="Image" src="https://github.com/user-attachments/assets/f3a504b2-bfc9-4f5c-ae4c-d7e4587e524d" />
 
 ## 🍎 ERD
-<img width="914" alt="Image" src="https://github.com/user-attachments/assets/f3a504b2-bfc9-4f5c-ae4c-d7e4587e524d" />
+![Image](https://github.com/user-attachments/assets/b9ee8b0b-1a48-4a54-a143-725cfb9acf24)
 
 
 ## 💻 주요 개발 내용
