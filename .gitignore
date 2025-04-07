@@ -8,7 +8,7 @@ build/
 .env.dev
 .env
 local.env
-imgs/github
+**/src/main/resources/static/imgs/github
 
 ### STS ###
 .apt_generated
