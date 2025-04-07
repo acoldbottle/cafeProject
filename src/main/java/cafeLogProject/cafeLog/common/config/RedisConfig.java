@@ -62,7 +62,7 @@ public class RedisConfig {
     }
 
     @Bean
-    public CacheManager boardCacheManager(RedisConnectionFactory redisConnectionFactory) {
+    public CacheManager CacheManager(RedisConnectionFactory redisConnectionFactory) {
         RedisCacheConfiguration redisCacheConfiguration = RedisCacheConfiguration
                 .defaultCacheConfig()
                 // Redis에 Key를 저장할 때 String으로 직렬화(변환)해서 저장

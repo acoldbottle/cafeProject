@@ -23,7 +23,6 @@ public class Review extends BaseEntity {
     private Long id;
 
     private String content;
-
     private int rating;
 
     private LocalDate visitDate;

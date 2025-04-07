@@ -182,34 +182,6 @@
 
 ## 📚 기술 스택
 
-<h3>프론트엔드</h3>
-<table>
-  <tr>
-    <td><img src="https://raw.githubusercontent.com/cafeLogProject/README/main/image/fe/react.svg" width="100"></td>
-    <td><img src="https://raw.githubusercontent.com/cafeLogProject/README/main/image/fe/typescript.svg" width="100"></td>
-    <td><img src="https://raw.githubusercontent.com/cafeLogProject/README/main/image/fe/vite.png" width="100"></td>
-    <td><img src="https://raw.githubusercontent.com/cafeLogProject/README/main/image/fe/reactquery.png" width="100"></td>
-    <td><img src="https://raw.githubusercontent.com/cafeLogProject/README/main/image/fe/zustand.jpg" width="100"></td>
-  </tr>
-  <tr>
-    <td>React</td>
-    <td>TypeScript</td>
-    <td>Vite</td>
-    <td>React Query</td>
-    <td>Zustand</td>
-  </tr>
-</table>
-
-<table>
-  <tr>
-    <td><img src="https://raw.githubusercontent.com/cafeLogProject/README/main/image/fe/scss.png" width="100"></td>
-  </tr>
-  <tr>
-    <td>SCSS</td>
-  </tr>
-</table>
-
-
 <h3>백엔드</h3>
 <table>
   <tr>
@@ -291,17 +263,14 @@
 
 <br>
 
-## 💻 주요 개발 내용
+## 📐 Architecture
+![Architecture](../imgs/github/cafe-project.png)
 
-### 프론트엔드
-- **검색 기능 개발**: 카페 및 사용자 검색 기능 구현
-- **리뷰 기능 구현**: 리뷰 작성, 수정, 삭제, 임시저장 기능 개발
-- **인증 관리**: Protected Route 설정, 사용자 인증 및 권한 관리
-- **이미지 관리**: UI와 동기화된 미리보기 이미지 업로드, 네비게이션 기능이 있는 뷰어 컴포넌트 개발
-- **무한 스크롤**: 리뷰 목록, 팔로우 리스트 등에 커서 기반 무한 스크롤 구현
-- **소셜 기능**: 팔로워/팔로잉 페이지, 프로필 검색, 팔로우/언팔로우 기능 구현
-- **상태 관리**: Zustand를 활용한 전역 상태 관리, React Query를 활용한 서버 상태 관리
-- **UI/UX 개선**: 로딩 스피너, 토스트 알림, 모달, 빈 데이터 표시 등 UI 컴포넌트 개발 및 스타일 최적화
+## 🍎 ERD
+![ERD](./imgs/github/erd.png)
+
+
+## 💻 주요 개발 내용
 
 ### 백엔드
 - **인증 시스템**: OAuth2를 활용한 소셜 로그인(구글, 페이스북, 네이버) 구현
@@ -319,46 +288,22 @@
 - [김병찬]
 	- 로그인 관련 기능
    		- OAuth2를 활용한 소셜로그인(구글, 페이스북, 네이버)
-  	- 프로필 관련 기능
-  		- 내 정보 수정, 조회
-		- 닉네임 중복 체크
-	- 사용사 소셜 관련 기능
-   		- 닉네임으로 유저 검색
+    - 스프링 시큐리티를 사용한 인증, 인가 기능
+      - JWT 토큰 발급, 재발급
+    - 프로필 관련 기능
+      - 내 정보 수정, 조회
+      - 닉네임 중복 체크
+	- 사용자 소셜 관련 기능
+		- 닉네임으로 유저 검색
 		- 팔로우, 언팔로우
-    		- 팔로우, 언팔로우 리스트 조회
-  	- 카페 관련 기능
-	  	- 네이버 검색 API를 활용하여 전국에 있는 카페 검색
-		- 카페 저장, 조회
-  	- 스크랩 관련 기능
-		- 내가 스크랩한 카페 리스트 조회
-		- 카페 스크랩 추가, 해제
-  	- 스프링 시큐리티를 사용한 인증, 인가 기능
-		- JWT 토큰 발급, 재발급
-
-- [문남경]
-	- QA 진행 및 css 수정
-- [이승헌]
-    - 마이페이지 관련 기능
-        - 내 정보 조회, 수정
-        - 프로필 이미지 조회, 수정
-    - UI 컴포넌트 관련 기능
-        - react-modal, react-toastify 사용
-- [임용태]
-    - 인증 관련 기능
-        - React-Router를 사용하여 Protected Route 설정
-        - 인증 확인 및 Redirect
+        - 팔로우, 언팔로우 리스트 조회
     - 카페 관련 기능
-        - 카페 검색, 저장
-        - 카페 상세 조회 및 상태에 따른 리뷰작성 버튼 표시
-    - 리뷰 관련 기능
-        - 리뷰 작성(날짜, 별점, 태그 컴포넌트)
-        - 리뷰 정렬, 태그 필터링
-    - 리뷰 임시저장 관련 기능
-        - 리뷰 임시저장 및 불러오기
-  	    - 임시저장 백엔드와 준실시간 연동
-    - 이미지 관련 기능
-        - 이미지 업로드 컴포넌트 구현(PhotoUploader)
-        - 이미지 업로드 Progress에 따른 UI 동기화(업로드 중/완료)
+        - 네이버 검색 API를 활용하여 전국에 있는 카페 검색
+        - 카페 저장, 조회
+        - 스크랩 관련 기능
+        - 내가 스크랩한 카페 리스트 조회
+        - 카페 스크랩 추가, 해제
+
 - [이주연]
   	- 리뷰 관련 기능
   	  	- QueryDsl를 사용한 조회 구현

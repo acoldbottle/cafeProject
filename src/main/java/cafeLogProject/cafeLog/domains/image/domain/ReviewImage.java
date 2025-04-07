@@ -1,14 +1,10 @@
 package cafeLogProject.cafeLog.domains.image.domain;
 
-import cafeLogProject.cafeLog.common.exception.ErrorCode;
-import cafeLogProject.cafeLog.common.exception.image.ImageInvalidException;
-import cafeLogProject.cafeLog.common.exception.image.ImageNotFoundException;
 import cafeLogProject.cafeLog.domains.review.domain.Review;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.UuidGenerator;
 import org.springframework.data.annotation.CreatedDate;
 
 import java.time.LocalDateTime;
