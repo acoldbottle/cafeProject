@@ -1,7 +1,9 @@
 package cafeLogProject.cafeLog.domains.user.repository;
 
 import cafeLogProject.cafeLog.api.user.dto.*;
+import cafeLogProject.cafeLog.domains.follow.domain.QFollow;
 import com.querydsl.core.Tuple;
+import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 
@@ -29,6 +31,9 @@ public class UserRepositoryImpl implements UserRepositoryCustom{
     @Override
     public Optional<OtherUserInfoRes> findOtherUserInfo(String currentUsername, Long otherUserId) {
 
+        QFollow followerFollow = new QFollow("followerFollow");
+        QFollow followingFollow = new QFollow("followingFollow");
+
         OtherUserInfoRes otherUser = queryFactory
                 .select(new QOtherUserInfoRes(
                         user.id,
@@ -37,16 +42,20 @@ public class UserRepositoryImpl implements UserRepositoryCustom{
                         user.email,
                         user.isImageExist,
                         follow.id.isNotNull().as("isFollow"),
-                        user.followerCnt,
-                        user.followingCnt,
+                        followerFollow.follower.count().intValue(),
+                        followingFollow.following.count().intValue(),
                         review.count().intValue()
                 ))
                 .from(user)
                 .leftJoin(follow)
-                .on(follow.follower.username.eq(currentUsername)
+                    .on(follow.follower.username.eq(currentUsername)
                         .and(follow.following.id.eq(otherUserId)))
                 .leftJoin(review)
-                .on(review.user.eq(user))
+                    .on(review.user.eq(user))
+                .leftJoin(followerFollow)
+                    .on(followerFollow.following.eq(user))
+                .leftJoin(followingFollow)
+                    .on(followingFollow.follower.eq(user))
                 .where(user.id.eq(otherUserId))
                 .groupBy(user.id, follow.id)
                 .fetchOne();
@@ -54,27 +63,35 @@ public class UserRepositoryImpl implements UserRepositoryCustom{
         return Optional.ofNullable(otherUser);
     }
 
+
     @Override
     public Optional<UserInfoRes> findMyProfileWithReviewCount(String username) {
 
-        UserInfoRes reviewCnt = queryFactory
+        QFollow followerFollow = new QFollow("followerFollow");
+        QFollow followingFollow = new QFollow("followingFollow");
+
+        UserInfoRes userInfoRes = queryFactory
                 .select(new QUserInfoRes(
                         user.id,
                         user.nickname,
                         user.introduce,
                         user.email,
                         user.isImageExist,
-                        user.followerCnt,
-                        user.followingCnt,
+                        followerFollow.follower.count().intValue(),
+                        followingFollow.following.count().intValue(),
                         review.count().intValue()
                 ))
                 .from(user)
                 .leftJoin(review).on(review.user.eq(user))
+                .leftJoin(followerFollow)
+                    .on(followerFollow.following.eq(user))
+                .leftJoin(followingFollow)
+                    .on(followingFollow.follower.eq(user))
                 .where(user.username.eq(username))
                 .groupBy(user.id)
                 .fetchOne();
 
-        return Optional.ofNullable(reviewCnt);
+        return Optional.ofNullable(userInfoRes);
     }
 
     @Override

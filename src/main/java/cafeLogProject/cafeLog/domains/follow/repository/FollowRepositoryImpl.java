@@ -4,6 +4,7 @@ import cafeLogProject.cafeLog.api.follow.dto.QUserFollowRes;
 import cafeLogProject.cafeLog.api.follow.dto.UserFollowRes;
 import cafeLogProject.cafeLog.common.exception.ErrorCode;
 import cafeLogProject.cafeLog.common.exception.FollowCursorException;
+import cafeLogProject.cafeLog.domains.follow.domain.QFollow;
 import cafeLogProject.cafeLog.domains.user.domain.User;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -63,21 +64,25 @@ public class FollowRepositoryImpl implements FollowRepositoryCustom {
      */
     private List<UserFollowRes> getFollowList(Long currentUserId, Long otherUserId, int limit, Long cursor, boolean isFollower) {
 
+        QFollow followerFollow = new QFollow("followerFollow");
+
         List<UserFollowRes> followList = queryFactory
                 .select(new QUserFollowRes(
                         user.id,
                         user.nickname,
                         user.isImageExist,
-                        user.followerCnt,
+                        followerFollow.follower.count().intValue(),
                         review.count().intValue(),
                         follow.id
                 ))
                 .from(follow)
                 .leftJoin(user).on(isFollower ? user.id.eq(follow.follower.id) : user.id.eq(follow.following.id))
                 .leftJoin(review).on(review.user.eq(user))
+                .leftJoin(followerFollow)
+                .on(followerFollow.following.eq(user))
                 .where(isFollower ? follow.following.id.eq(otherUserId) : follow.follower.id.eq(otherUserId))
                 .groupBy(user.id, follow.id)
-                .fetch();
+                .fetch();;
 
         List<Long> myFollowingList = getMyFollowingList(currentUserId);
         setIsFollow(currentUserId, followList, myFollowingList);

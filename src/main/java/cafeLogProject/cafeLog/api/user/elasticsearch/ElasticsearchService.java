@@ -33,28 +33,36 @@ public class ElasticsearchService {
     private final UserRepository userRepository;
     private final ElasticsearchOperations elasticsearchOperations;
 
+//    @Transactional
+//    public void saveAllNickname() {
+//
+//        List<NicknameDocument> nicknameDocuments = new ArrayList<>();
+//
+//        for (User user : userRepository.findAll()) {
+//            nicknameDocuments.add(NicknameDocument.from(user));
+//        }
+//        int batchSize = 2000;
+//        for (int i = 0; i < nicknameDocuments.size(); i += batchSize) {
+//            int end = Math.min(i + batchSize, nicknameDocuments.size());
+//            List<NicknameDocument> batch = nicknameDocuments.subList(i, end);
+//
+//            List<IndexQuery> queries = new ArrayList<>();
+//            for (NicknameDocument document : batch) {
+//                IndexQuery indexQuery = new IndexQueryBuilder()
+//                        .withId(String.valueOf(document.getId()))
+//                        .withObject(document)
+//                        .build();
+//                queries.add(indexQuery);
+//            }
+//            elasticsearchOperations.bulkIndex(queries, NicknameDocument.class);
+//        }
+//    }
+
     @Transactional
     public void saveAllNickname() {
-
-        List<NicknameDocument> nicknameDocuments = new ArrayList<>();
-
-        for (User user : userRepository.findAll()) {
-            nicknameDocuments.add(NicknameDocument.from(user));
-        }
-        int batchSize = 2000;
-        for (int i = 0; i < nicknameDocuments.size(); i += batchSize) {
-            int end = Math.min(i + batchSize, nicknameDocuments.size());
-            List<NicknameDocument> batch = nicknameDocuments.subList(i, end);
-
-            List<IndexQuery> queries = new ArrayList<>();
-            for (NicknameDocument document : batch) {
-                IndexQuery indexQuery = new IndexQueryBuilder()
-                        .withId(String.valueOf(document.getId()))
-                        .withObject(document)
-                        .build();
-                queries.add(indexQuery);
-            }
-            elasticsearchOperations.bulkIndex(queries, NicknameDocument.class);
+        List<User> users = userRepository.findAll();
+        for (User user : users) {
+            elasticsearchOperations.save(NicknameDocument.from(user));
         }
     }
 

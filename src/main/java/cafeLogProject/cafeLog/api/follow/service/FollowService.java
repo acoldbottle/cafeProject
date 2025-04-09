@@ -101,8 +101,6 @@ public class FollowService {
                 .build();
 
         followRepository.save(follow);
-        currentUser.plusFollowingCnt();
-        otherUser.plusFollowerCnt();
         log.info("{} 님을 팔로우했습니다.", otherUser.getNickname());
     }
 
@@ -114,8 +112,6 @@ public class FollowService {
     private void deleteFollowAndMinusCount(User currentUser, User otherUser) {
 
         followRepository.deleteFollow(currentUser, otherUser);
-        currentUser.minusFollowingCnt();
-        otherUser.minusFollowerCnt();
         log.info("{} 님을 언팔로우했습니다.", otherUser.getNickname());
     }
 }
