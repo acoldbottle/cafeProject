@@ -23,7 +23,7 @@ public class UserController {
     @GetMapping("/my/profile")
     public ResponseEntity<UserInfoRes> getUserInfo(@AuthenticationPrincipal CustomOAuth2User user) {
 
-        UserInfoRes userInfo = userService.getUserInfo(user.getName());
+        UserInfoRes userInfo = userService.getUserInfo(user.getUserId());
         return ResponseEntity.ok(userInfo);
     }
 
@@ -31,7 +31,7 @@ public class UserController {
     public ResponseEntity<Void> updateUser(@AuthenticationPrincipal CustomOAuth2User user,
                                            @RequestBody @Valid UserUpdateReq userUpdateReq) {
 
-        userService.updateUser(user.getName(), userUpdateReq);
+        userService.updateUser(user.getUserId(), userUpdateReq);
         return ResponseEntity.noContent().build();
     }
 
@@ -39,15 +39,14 @@ public class UserController {
     public ResponseEntity<IsExistNicknameRes> isExistNickname(@RequestParam @Valid String nickname,
                                                               @AuthenticationPrincipal CustomOAuth2User user) {
 
-        IsExistNicknameRes isExist = userService.isExistNickname(user.getName(), nickname);
+        IsExistNicknameRes isExist = userService.isExistNickname(user.getUserId(), nickname);
         return ResponseEntity.ok(isExist);
     }
 
-    @GetMapping("/users/{userId}")
-    public ResponseEntity<OtherUserInfoRes> getOtherUserInfo(@AuthenticationPrincipal CustomOAuth2User user,
-                                                             @PathVariable Long userId) {
-
-        OtherUserInfoRes otherUserInfo = userService.getOtherUserInfo(user.getName(), userId);
+    @GetMapping("/users/{otherUserId}")
+    public ResponseEntity<UserInfoRes> getOtherUserInfo(@AuthenticationPrincipal CustomOAuth2User user,
+                                                             @PathVariable Long otherUserId) {
+        UserInfoRes otherUserInfo = userService.getOtherUserInfo(user.getUserId(), otherUserId);
         return ResponseEntity.ok(otherUserInfo);
     }
 
@@ -55,7 +54,8 @@ public class UserController {
     public ResponseEntity<List<UserSearchRes>> searchUserByNickname(@RequestParam String nickname,
                                                                     @AuthenticationPrincipal CustomOAuth2User user) {
 
-        List<UserSearchRes> userSearchRes = userService.searchUserByNickname(nickname, user.getName());
+        List<UserSearchRes> userSearchRes = userService.searchUserByNickname(nickname, user.getUserId());
         return ResponseEntity.ok(userSearchRes);
     }
+
 }

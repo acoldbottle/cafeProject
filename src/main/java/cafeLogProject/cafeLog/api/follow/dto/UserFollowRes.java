@@ -14,9 +14,9 @@ public class UserFollowRes {
 
     private Boolean isProfileImageExist;
 
-    private int follower_cnt;
+    private int followerCnt;
 
-    private int review_cnt;
+    private int reviewCnt;
 
     @JsonProperty("isFollow")
     private int isFollow;
@@ -24,13 +24,14 @@ public class UserFollowRes {
     private Long followId;
 
     @QueryProjection
-    public UserFollowRes(Long userId, String nickname, Boolean isProfileImageExist, int follower_cnt, int review_cnt, Long followId) {
+    public UserFollowRes(Long userId, String nickname, Boolean isProfileImageExist, int follower_cnt, int review_cnt, int isFollow, Long followId) {
 
         this.userId = userId;
         this.nickname = nickname;
         this.isProfileImageExist = isProfileImageExist;
-        this.follower_cnt = follower_cnt;
-        this.review_cnt = review_cnt;
+        this.followerCnt = follower_cnt;
+        this.reviewCnt = review_cnt;
+        this.isFollow = isFollow;
         this.followId = followId;
     }
 }

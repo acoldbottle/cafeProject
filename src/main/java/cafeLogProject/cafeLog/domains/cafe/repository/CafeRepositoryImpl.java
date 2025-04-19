@@ -1,15 +1,8 @@
 package cafeLogProject.cafeLog.domains.cafe.repository;
 
-import cafeLogProject.cafeLog.api.cafe.dto.CafeInfoRes;
-import cafeLogProject.cafeLog.api.cafe.dto.QCafeInfoRes;
-import cafeLogProject.cafeLog.domains.favorite.domain.QFavorite;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 
-import java.util.Optional;
-
-import static cafeLogProject.cafeLog.domains.cafe.domain.QCafe.cafe;
-import static cafeLogProject.cafeLog.domains.favorite.domain.QFavorite.*;
 import static cafeLogProject.cafeLog.domains.review.domain.QReview.review;
 
 @RequiredArgsConstructor
@@ -18,32 +11,19 @@ public class CafeRepositoryImpl implements CafeRepositoryCustom{
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public Optional<CafeInfoRes> findCafeWithAverageRating(Long cafeId, String username) {
+    public double calculateAvgRating(Long cafeId) {
 
-
-        CafeInfoRes result = queryFactory
-                .select(new QCafeInfoRes(
-                        cafe.cafeName,
-                        cafe.address,
-                        cafe.roadAddress,
-                        cafe.mapx,
-                        cafe.mapy,
-                        cafe.link,
-                        cafe.isClosedDown,
-                        review.rating.avg().doubleValue()
-                ))
-                .from(cafe)
-                .leftJoin(review).on(review.cafe.id.eq(cafeId))
-                .where(cafe.id.eq(cafeId))
+        Double avgRating = queryFactory.select(review.rating.avg().doubleValue())
+                .from(review)
+                .where(review.cafe.id.eq(cafeId))
                 .fetchOne();
 
-        boolean isScrap = queryFactory
-                .selectFrom(favorite)
-                .where(favorite.cafe.id.eq(cafeId)
-                        .and(favorite.user.username.eq(username)))
-                .fetchOne() != null;
+        if (avgRating == null) {
+            return 0.0;
+        }
 
-        result.setScrap(isScrap);
-        return Optional.ofNullable(result).filter(r -> r.getCafeName() != null);
+        return Math.round(avgRating * 10.0) / 10.0;
     }
+
+
 }

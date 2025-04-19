@@ -91,6 +91,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                         newUser.setNicknameFirstLogin(nicknameGenerator.generateNickname());
                         User savedUser = userRepository.save(newUser);
                         nicknameDocumentRepository.save(NicknameDocument.from(savedUser));
+                        user.setUserId(savedUser.getId());
                         log.info("새로운 사용자 등록, username={}", user.getUsername());
                         return newUser;
                     } catch (Exception e) {
@@ -99,6 +100,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                     }
                 });
 
+        user.setUserId(existingUser.getId());
         log.info("사용자 로그인, username={}", existingUser.getUsername());
     }
 }

@@ -39,10 +39,6 @@ public class User extends BaseEntity {
 
     private String provider;
 
-//    private int followerCnt = 0;
-//
-//    private int followingCnt= 0;
-
     @Enumerated(EnumType.STRING)
     private UserRole role = ROLE_USER;
 
@@ -75,23 +71,4 @@ public class User extends BaseEntity {
         this.nickname = randomNickname;
     }
 
-//    public void plusFollowerCnt() {
-//        this.followerCnt += 1;
-//    }
-//
-//    public void minusFollowerCnt() {
-//        if (this.followerCnt > 0) {
-//            this.followerCnt -= 1;
-//        }
-//    }
-//
-//    public void plusFollowingCnt() {
-//        this.followingCnt += 1;
-//    }
-//
-//    public void minusFollowingCnt() {
-//        if (this.followingCnt > 0) {
-//            this.followingCnt -= 1;
-//        }
-//    }
 }

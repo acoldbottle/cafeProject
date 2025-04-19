@@ -8,7 +8,9 @@ import java.util.List;
 public interface FollowRepositoryCustom {
 
     void deleteFollow(User currentUser, User otherUser);
-    List<UserFollowRes> getFollowerList(Long currentUserId, Long otherUserId, int limit, Long cursor);
-    List<UserFollowRes> getFollowingList(Long currentUserId, Long otherUserId, int limit, Long cursor);
 
+    boolean isFollowingOtherUser(Long currentUserId, Long otherUserId);
+
+    List<UserFollowRes> getFollowerList(Long currentUserId, Long otherUserId, int limit, Long cursor, Integer isFollow);
+    List<UserFollowRes> getFollowingList(Long currentUserId, Long otherUserId, int limit, Long cursor, Integer isFollow);
 }

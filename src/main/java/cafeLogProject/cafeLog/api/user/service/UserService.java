@@ -1,15 +1,18 @@
 package cafeLogProject.cafeLog.api.user.service;
 
+import cafeLogProject.cafeLog.api.common.CacheService;
 import cafeLogProject.cafeLog.api.user.dto.*;
 import cafeLogProject.cafeLog.api.user.elasticsearch.NicknameDocument;
 import cafeLogProject.cafeLog.api.user.elasticsearch.NicknameDocumentRepository;
 import cafeLogProject.cafeLog.common.auth.jwt.JWTUserDTO;
 import cafeLogProject.cafeLog.common.exception.user.UserNicknameException;
 import cafeLogProject.cafeLog.common.exception.user.UserNotFoundException;
+import cafeLogProject.cafeLog.domains.follow.repository.FollowRepository;
 import cafeLogProject.cafeLog.domains.user.domain.User;
 import cafeLogProject.cafeLog.domains.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,19 +29,22 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final NicknameDocumentRepository nicknameDocumentRepository;
+    private final CacheService userCacheService;
+    private final FollowRepository followRepository;
 
-    public UserInfoRes getUserInfo(String username) {
+    public UserInfoRes getUserInfo(Long userId) {
 
-        return userRepository.findMyProfileWithReviewCount(username)
-                .orElseThrow(() -> new UserNotFoundException(USER_NOT_FOUND_ERROR));
+        UserInfoRes userinfoRes = userCacheService.getUserBasicInfo(userId);
+        return userRepository.getFollowCntAndReviewCnt(userinfoRes);
     }
 
     @Transactional
-    public void updateUser(String username, UserUpdateReq userUpdateReq) {
+    @CacheEvict(value = "cacheUser", key = "'users:' + #userId + ':info'")
+    public void updateUser(Long userId, UserUpdateReq userUpdateReq) {
 
-        User user = userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException(USER_NOT_FOUND_ERROR));
+        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(USER_NOT_FOUND_ERROR));
 
-        validateNickname(username, userUpdateReq);
+        validateNickname(user.getId(), userUpdateReq);
 
         user.updateUserNickname(userUpdateReq.getNickName());
         user.updateUserIntroduce(userUpdateReq.getIntroduce());
@@ -47,39 +53,40 @@ public class UserService {
         nicknameDocumentRepository.save(NicknameDocument.from(updatedUser));
     }
 
-    public IsExistNicknameRes isExistNickname(String username, String nickname) {
+    public IsExistNicknameRes isExistNickname(Long userId, String nickname) {
 
-        if (!userRepository.existsNicknameExcludingSelf(username, nickname)) {
+        if (!userRepository.existsNicknameExcludingSelf(userId, nickname)) {
             return new IsExistNicknameRes(nickname, false);
         }
 
         return new IsExistNicknameRes(nickname, true);
     }
 
-    public OtherUserInfoRes getOtherUserInfo(String currentUsername, Long otherUserId) {
+    public UserInfoRes getOtherUserInfo(Long currentUserId, Long otherUserId) {
 
-        return userRepository.findOtherUserInfo(currentUsername, otherUserId)
-                .orElseThrow(() -> new UserNotFoundException(USER_NOT_FOUND_ERROR));
+        UserInfoRes otherUserBasicInfo = userCacheService.getUserBasicInfo(otherUserId);
+        UserInfoRes otherUserInfo = userRepository.getFollowCntAndReviewCnt(otherUserBasicInfo);
+        boolean isFollowing = followRepository.isFollowingOtherUser(currentUserId, otherUserId);
+        otherUserInfo.setFollow(isFollowing);
+
+        return otherUserInfo;
     }
 
-    public List<UserSearchRes> searchUserByNickname(String searchNickname, String currentUsername) {
+    public List<UserSearchRes> searchUserByNickname(String searchNickname, Long currentUserId) {
 
         if (searchNickname == null || searchNickname.trim().isEmpty()) {
             throw new UserNicknameException(USER_NICKNAME_NULL_ERROR);
         }
 
-        User user = userRepository.findByUsername(currentUsername)
-                .orElseThrow(() -> new UserNotFoundException(USER_NOT_FOUND_ERROR));
-
         List<UserSearchRes> findUsers = userRepository.findUsersByNickname(searchNickname);
 
-        return userRepository.searchUserByNickname(searchNickname, user.getId(), findUsers);
+        return userRepository.searchUserByNickname(searchNickname, currentUserId, findUsers);
     }
 
-    private void validateNickname(String userName, UserUpdateReq userUpdateReq) {
+    private void validateNickname(Long userId, UserUpdateReq userUpdateReq) {
 
-        if (userUpdateReq.getNickName() != null && userRepository.existsNicknameExcludingSelf(userName, userUpdateReq.getNickName())) {
-            log.warn("nickname is duplicate. user = {}, nickname = {}", userName, userUpdateReq.getNickName());
+        if (userUpdateReq.getNickName() != null && userRepository.existsNicknameExcludingSelf(userId, userUpdateReq.getNickName())) {
+            log.warn("nickname is duplicate. user = {}, nickname = {}", userId, userUpdateReq.getNickName());
             throw new UserNicknameException(USER_NICKNAME_ERROR);
         }
     }

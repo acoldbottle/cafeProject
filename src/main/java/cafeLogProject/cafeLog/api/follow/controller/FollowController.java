@@ -18,40 +18,40 @@ public class FollowController {
 
     private final FollowService followService;
 
-    @PostMapping("/follow/{userId}")
+    @PostMapping("/follow/{otherUserId}")
     public ResponseEntity<FollowRes> followUser(@AuthenticationPrincipal CustomOAuth2User user,
-                                                @PathVariable Long userId) {
+                                                @PathVariable Long otherUserId) {
 
-        FollowRes followRes = followService.followUser(user.getName(), userId);
+        FollowRes followRes = followService.followUser(user.getUserId(), otherUserId);
         return ResponseEntity.ok(followRes);
     }
 
-    @DeleteMapping("/follow/{userId}")
+    @DeleteMapping("/follow/{otherUserId}")
     public ResponseEntity<FollowRes> unfollowUser(@AuthenticationPrincipal CustomOAuth2User user,
-                                                @PathVariable Long userId) {
+                                                @PathVariable Long otherUserId) {
 
-        FollowRes followRes = followService.unfollowUser(user.getName(), userId);
+        FollowRes followRes = followService.unfollowUser(user.getUserId(), otherUserId);
         return ResponseEntity.ok(followRes);
     }
 
-    @GetMapping("/users/{userId}/follower")
+    @GetMapping("/users/{otherUserId}/follower")
     public ResponseEntity<List<UserFollowRes>> getFollowerList(@AuthenticationPrincipal CustomOAuth2User user,
-                                                               @PathVariable Long userId,
+                                                               @PathVariable Long otherUserId,
                                                                @RequestParam(defaultValue = "10") int limit,
                                                                @RequestParam(required = false) Long cursor
                                                                ) {
 
-        List<UserFollowRes> followerList = followService.getFollowerList(user.getName(), userId, limit, cursor);
+        List<UserFollowRes> followerList = followService.getFollowList(user.getUserId(), otherUserId, limit, cursor, FollowService.FOLLOWER_LIST);
         return ResponseEntity.ok(followerList);
     }
 
-    @GetMapping("/users/{userId}/following")
+    @GetMapping("/users/{otherUserId}/following")
     public ResponseEntity<List<UserFollowRes>> getFollowingList(@AuthenticationPrincipal CustomOAuth2User user,
-                                                                @PathVariable Long userId,
+                                                                @PathVariable Long otherUserId,
                                                                 @RequestParam(defaultValue = "10") int limit,
                                                                 @RequestParam(required = false) Long cursor) {
 
-        List<UserFollowRes> followingList = followService.getFollowingList(user.getName(), userId, limit, cursor);
+        List<UserFollowRes> followingList = followService.getFollowList(user.getUserId(), otherUserId, limit, cursor, FollowService.FOLLOWING_LIST);
         return ResponseEntity.ok(followingList);
     }
 }

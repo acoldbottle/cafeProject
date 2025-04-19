@@ -1,12 +1,17 @@
 package cafeLogProject.cafeLog.api.user.dto;
 
-import com.querydsl.core.annotations.QueryProjection;
+import cafeLogProject.cafeLog.domains.user.domain.User;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import java.util.LinkedList;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class UserInfoRes {
 
     private Long userId;
@@ -25,15 +30,16 @@ public class UserInfoRes {
 
     private int review_cnt;
 
-    @QueryProjection
-    public UserInfoRes(Long userId, String nickname, String introduce, String email, Boolean isProfileImageExist, int follower_cnt, int following_cnt, int review_cnt) {
-        this.userId = userId;
-        this.nickname = nickname;
-        this.introduce = introduce;
-        this.email = email;
-        this.isProfileImageExist = isProfileImageExist;
-        this.follower_cnt = follower_cnt;
-        this.following_cnt = following_cnt;
-        this.review_cnt = review_cnt;
+    @JsonProperty("isFollow")
+    private boolean isFollow;
+
+    public static UserInfoRes from(User user) {
+        return UserInfoRes.builder()
+                .userId(user.getId())
+                .nickname(user.getNickname())
+                .introduce(user.getIntroduce())
+                .email(user.getEmail())
+                .isProfileImageExist(user.isImageExist())
+                .build();
     }
 }

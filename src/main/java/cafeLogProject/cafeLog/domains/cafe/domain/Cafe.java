@@ -17,7 +17,6 @@ public class Cafe {
 
     @Column(name = "cafe_name")
     private String cafeName;
-    private boolean isClosedDown = false;
     private String mapx;
     private String mapy;
     private String address;

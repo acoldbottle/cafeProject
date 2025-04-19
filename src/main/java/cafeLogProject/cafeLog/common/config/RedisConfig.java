@@ -11,13 +11,13 @@ import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.data.redis.repository.configuration.EnableRedisRepositories;
 
 import java.time.Duration;
-import java.util.List;
 
 @Configuration
 @EnableCaching
@@ -43,6 +43,7 @@ public class RedisConfig {
         return createRedisTemplate(redisConnectionFactory, RefreshToken.class);
     }
 
+
     private <T> RedisTemplate<String, T> createRedisTemplate(RedisConnectionFactory redisConnectionFactory, Class<T> clazz) {
 
         RedisTemplate<String, T> template = new RedisTemplate<>();
@@ -62,25 +63,16 @@ public class RedisConfig {
     }
 
     @Bean
-    public CacheManager CacheManager(RedisConnectionFactory redisConnectionFactory) {
-        RedisCacheConfiguration redisCacheConfiguration = RedisCacheConfiguration
-                .defaultCacheConfig()
-                // Redis에 Key를 저장할 때 String으로 직렬화(변환)해서 저장
+    public CacheManager cacheManagerForOne() {
+        RedisCacheConfiguration redisCacheConfiguration = RedisCacheConfiguration.defaultCacheConfig()
                 .serializeKeysWith(
-                        RedisSerializationContext.SerializationPair.fromSerializer(
-                                new StringRedisSerializer()))
-                // Redis에 Value를 저장할 때 Json으로 직렬화(변환)해서 저장
-                .serializeValuesWith(
-                        RedisSerializationContext.SerializationPair.fromSerializer(
-                                new Jackson2JsonRedisSerializer<Object>(Object.class)
-                        )
-                )
-                // 데이터의 만료기간(TTL) 설정
+                        RedisSerializationContext.SerializationPair.fromSerializer(new StringRedisSerializer()))
+                .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(
+                        new GenericJackson2JsonRedisSerializer()))
                 .entryTtl(Duration.ofMinutes(60L));
-
         return RedisCacheManager
                 .RedisCacheManagerBuilder
-                .fromConnectionFactory(redisConnectionFactory)
+                .fromConnectionFactory(redisConnectionFactory())
                 .cacheDefaults(redisCacheConfiguration)
                 .build();
     }

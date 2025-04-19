@@ -1,9 +1,10 @@
 package cafeLogProject.cafeLog.domains.user.repository;
 
 import cafeLogProject.cafeLog.api.user.dto.*;
+import cafeLogProject.cafeLog.domains.follow.domain.Follow;
 import cafeLogProject.cafeLog.domains.follow.domain.QFollow;
+import cafeLogProject.cafeLog.domains.review.domain.QReview;
 import com.querydsl.core.Tuple;
-import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 
@@ -19,80 +20,44 @@ public class UserRepositoryImpl implements UserRepositoryCustom{
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public boolean existsNicknameExcludingSelf(String username, String newNickname) {
+    public boolean existsNicknameExcludingSelf(Long userId, String newNickname) {
 
         return queryFactory
                 .selectFrom(user)
                 .where(user.nickname.eq(newNickname)
-                        .and(user.username.ne(username)))
+                        .and(user.id.ne(userId)))
                 .fetchOne() != null;
     }
 
     @Override
-    public Optional<OtherUserInfoRes> findOtherUserInfo(String currentUsername, Long otherUserId) {
+    public UserInfoRes getFollowCntAndReviewCnt(UserInfoRes userInfoRes) {
 
-        QFollow followerFollow = new QFollow("followerFollow");
-        QFollow followingFollow = new QFollow("followingFollow");
-
-        OtherUserInfoRes otherUser = queryFactory
-                .select(new QOtherUserInfoRes(
-                        user.id,
-                        user.nickname,
-                        user.introduce,
-                        user.email,
-                        user.isImageExist,
-                        follow.id.isNotNull().as("isFollow"),
-                        followerFollow.follower.count().intValue(),
-                        followingFollow.following.count().intValue(),
-                        review.count().intValue()
-                ))
-                .from(user)
-                .leftJoin(follow)
-                    .on(follow.follower.username.eq(currentUsername)
-                        .and(follow.following.id.eq(otherUserId)))
-                .leftJoin(review)
-                    .on(review.user.eq(user))
-                .leftJoin(followerFollow)
-                    .on(followerFollow.following.eq(user))
-                .leftJoin(followingFollow)
-                    .on(followingFollow.follower.eq(user))
-                .where(user.id.eq(otherUserId))
-                .groupBy(user.id, follow.id)
+        Long userId = userInfoRes.getUserId();
+        Long followerCnt = queryFactory
+                .select(follow.count())
+                .from(follow)
+                .where(follow.following.id.eq(userId))
                 .fetchOne();
 
-        return Optional.ofNullable(otherUser);
-    }
-
-
-    @Override
-    public Optional<UserInfoRes> findMyProfileWithReviewCount(String username) {
-
-        QFollow followerFollow = new QFollow("followerFollow");
-        QFollow followingFollow = new QFollow("followingFollow");
-
-        UserInfoRes userInfoRes = queryFactory
-                .select(new QUserInfoRes(
-                        user.id,
-                        user.nickname,
-                        user.introduce,
-                        user.email,
-                        user.isImageExist,
-                        followerFollow.follower.count().intValue(),
-                        followingFollow.following.count().intValue(),
-                        review.count().intValue()
-                ))
-                .from(user)
-                .leftJoin(review).on(review.user.eq(user))
-                .leftJoin(followerFollow)
-                    .on(followerFollow.following.eq(user))
-                .leftJoin(followingFollow)
-                    .on(followingFollow.follower.eq(user))
-                .where(user.username.eq(username))
-                .groupBy(user.id)
+        Long followingCnt = queryFactory
+                .select(follow.count())
+                .from(follow)
+                .where(follow.follower.id.eq(userId))
                 .fetchOne();
 
-        return Optional.ofNullable(userInfoRes);
+        Long reviewCnt = queryFactory
+                .select(review.count())
+                .from(review)
+                .where(review.user.id.eq(userId))
+                .fetchOne();
+
+        userInfoRes.setFollower_cnt(followerCnt != null ? followerCnt.intValue() : 0);
+        userInfoRes.setFollowing_cnt(followingCnt != null ? followingCnt.intValue() : 0);
+        userInfoRes.setReview_cnt(reviewCnt != null ? reviewCnt.intValue() : 0);
+
+        return userInfoRes;
     }
+
 
     @Override
     public List<UserSearchRes> findUsersByNickname(String searchNickname) {
@@ -106,6 +71,7 @@ public class UserRepositoryImpl implements UserRepositoryCustom{
                 .where(user.nickname.containsIgnoreCase(searchNickname))
                 .fetch();
     }
+
     /**
      *
      * @param searchNickname 검색하려는 닉네임

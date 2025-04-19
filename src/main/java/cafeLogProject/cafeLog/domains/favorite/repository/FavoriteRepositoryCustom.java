@@ -6,9 +6,9 @@ import java.util.List;
 
 public interface FavoriteRepositoryCustom {
 
-    void deleteFavorite(String username, Long cafeId);
+    void deleteFavorite(Long userId, Long cafeId);
 
-    boolean isExistFavorite(String username, Long cafeId);
+    boolean isExistFavorite(Long userId, Long cafeId);
 
-    List<FavoriteCafeInfo> findMyFavoriteCafes(String username);
+    List<FavoriteCafeInfo> findMyFavoriteCafes(Long userId);
 }

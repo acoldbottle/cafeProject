@@ -23,6 +23,7 @@ public class CustomOAuth2User implements OAuth2User {
 
     public CustomOAuth2User(JWTUserDTO jwtUserDTO) {
         OAuth2UserDTO oAuth2UserDTO = new OAuth2UserDTO();
+        oAuth2UserDTO.setUserId(jwtUserDTO.getUserId());
         oAuth2UserDTO.setUsername(jwtUserDTO.getUsername());
         oAuth2UserDTO.setRole(jwtUserDTO.getUserRole());
         this.oAuth2UserDTO = oAuth2UserDTO;
@@ -43,4 +44,7 @@ public class CustomOAuth2User implements OAuth2User {
         return oAuth2UserDTO.getUsername();
     }
 
+    public Long getUserId(){
+        return oAuth2UserDTO.getUserId();
+    }
 }

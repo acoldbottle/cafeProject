@@ -15,7 +15,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
-import static cafeLogProject.cafeLog.common.exception.ErrorCode.*;
+import static cafeLogProject.cafeLog.common.exception.ErrorCode.CAFE_CATEGORY_ERROR;
+import static cafeLogProject.cafeLog.common.exception.ErrorCode.CAFE_NOT_FOUND_ERROR;
 
 @Service
 @Slf4j
@@ -26,10 +27,15 @@ public class CafeService {
     private final CafeRepository cafeRepository;
     private final FavoriteRepository favoriteRepository;
 
-    public CafeInfoRes getCafeInfo(Long cafeId, String username) {
+    public CafeInfoRes getCafeInfo(Long cafeId, Long userId) {
 
-        return cafeRepository.findCafeWithAverageRating(cafeId, username)
+        Cafe findCafe = cafeRepository.findById(cafeId)
                 .orElseThrow(() -> new CafeNotFoundException(CAFE_NOT_FOUND_ERROR));
+        CafeInfoRes cafe = CafeInfoRes.from(findCafe);
+        cafe.setAvgRating(cafeRepository.calculateAvgRating(cafeId));
+        cafe.setScrap(favoriteRepository.isExistFavorite(userId, cafeId));
+
+        return cafe;
     }
 
     @Transactional
@@ -50,7 +56,6 @@ public class CafeService {
                 .map(cafe -> new IsExistCafeRes(cafe.getId(), true))
                 .orElseGet(() -> new IsExistCafeRes(null, false));
     }
-
 
     private void validateCafeCategory(SaveCafeReq cafeReq) {
 

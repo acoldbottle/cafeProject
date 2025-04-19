@@ -151,7 +151,7 @@ public class JWTFilter extends OncePerRequestFilter {
 
         ResponseCookie access = createCookie("access", tokenArr[0]);
         ResponseCookie refresh = createCookie("refresh", tokenArr[1]);
-
+        log.info("reissue refresh = {}", tokenArr[1]);
         addResponseCookie(response, access);
         addResponseCookie(response, refresh);
 

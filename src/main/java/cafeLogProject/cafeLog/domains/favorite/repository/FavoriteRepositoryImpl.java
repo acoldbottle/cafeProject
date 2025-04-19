@@ -16,26 +16,26 @@ public class FavoriteRepositoryImpl implements FavoriteRepositoryCustom{
 
 
     @Override
-    public void deleteFavorite(String username, Long cafeId) {
+    public void deleteFavorite(Long userId, Long cafeId) {
 
         queryFactory.delete(favorite)
-                .where(favorite.user.username.eq(username)
+                .where(favorite.user.id.eq(userId)
                         .and(favorite.cafe.id.eq(cafeId)))
                 .execute();
     }
 
     @Override
-    public boolean isExistFavorite(String username, Long cafeId) {
+    public boolean isExistFavorite(Long userId, Long cafeId) {
 
         return queryFactory
                 .selectFrom(favorite)
-                .where(favorite.user.username.eq(username)
+                .where(favorite.user.id.eq(userId)
                         .and(favorite.cafe.id.eq(cafeId)))
                 .fetchOne() != null;
     }
 
     @Override
-    public List<FavoriteCafeInfo> findMyFavoriteCafes(String username) {
+    public List<FavoriteCafeInfo> findMyFavoriteCafes(Long userId) {
 
         return queryFactory
                 .select(new QFavoriteCafeInfo(
@@ -44,7 +44,7 @@ public class FavoriteRepositoryImpl implements FavoriteRepositoryCustom{
                         favorite.cafe.address
                 ))
                 .from(favorite)
-                .where(favorite.user.username.eq(username))
+                .where(favorite.user.id.eq(userId))
                 .fetch();
     }
 }

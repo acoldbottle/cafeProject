@@ -33,7 +33,7 @@ public class JWTTokenService {
         String newAccess = createNewAccess(userInfo.getUserId(), userInfo.getUsername(), userInfo.getUserRole());
         String newRefresh = createNewRefresh(userInfo.getUserId(), userInfo.getUsername(), userInfo.getUserRole());
 
-        addBlacklist(userInfo.getUsername(), newRefresh);
+        addBlacklist(userInfo.getUsername(), refreshToken);
         log.info("{} : Reissued token", userInfo.getUsername());
 
         return newAccess + " " + newRefresh;
@@ -84,7 +84,7 @@ public class JWTTokenService {
      * 새로 생성한 refresh 토큰을 저장
      */
     public void addBlacklist(String username, String newRefresh) {
-
+        log.info("blacklist refresh = {}", newRefresh);
         refreshRepository.save(
                 RefreshToken
                         .builder()

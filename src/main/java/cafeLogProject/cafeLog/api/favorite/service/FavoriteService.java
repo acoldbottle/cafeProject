@@ -30,44 +30,44 @@ public class FavoriteService {
     private final CafeRepository cafeRepository;
 
     @Transactional
-    public ToggleFavoriteRes toggleFavorite(String username, ToggleFavoriteReq toggleFavoriteReq) {
+    public ToggleFavoriteRes toggleFavorite(Long userId, ToggleFavoriteReq toggleFavoriteReq) {
 
         if (!toggleFavoriteReq.getIsScrap()) {
-            return removeFavorite(username, toggleFavoriteReq);
+            return removeFavorite(userId, toggleFavoriteReq);
         } else {
-            return addFavorite(username, toggleFavoriteReq.getCafeId());
+            return addFavorite(userId, toggleFavoriteReq.getCafeId());
         }
     }
 
-    public List<FavoriteCafeInfo> getMyFavoriteCafeList(String username) {
+    public List<FavoriteCafeInfo> getMyFavoriteCafeList(Long userId) {
 
-        List<FavoriteCafeInfo> myFavoriteCafes = favoriteRepository.findMyFavoriteCafes(username);
+        List<FavoriteCafeInfo> myFavoriteCafes = favoriteRepository.findMyFavoriteCafes(userId);
         if (myFavoriteCafes.isEmpty()) {
-            log.info("User {} : scraped cafe is null", username);
+            log.info("User {} : scraped cafe is null", userId);
         }
 
         return myFavoriteCafes;
     }
 
-    private ToggleFavoriteRes removeFavorite(String username, ToggleFavoriteReq toggleFavoriteReq) {
+    private ToggleFavoriteRes removeFavorite(Long userId, ToggleFavoriteReq toggleFavoriteReq) {
 
-        favoriteRepository.deleteFavorite(username, toggleFavoriteReq.getCafeId());
-        log.info("User {} removed cafe {} from favorites", username, toggleFavoriteReq.getCafeId());
+        favoriteRepository.deleteFavorite(userId, toggleFavoriteReq.getCafeId());
+        log.info("User {} removed cafe {} from favorites", userId, toggleFavoriteReq.getCafeId());
         return new ToggleFavoriteRes("해당 카페를 즐겨찾기에서 해제했습니다.");
     }
 
-    private ToggleFavoriteRes addFavorite(String username, Long cafeId) {
+    private ToggleFavoriteRes addFavorite(Long userId, Long cafeId) {
 
-        if (!favoriteRepository.isExistFavorite(username, cafeId)) {
+        if (!favoriteRepository.isExistFavorite(userId, cafeId)) {
             Favorite favorite = Favorite.builder()
-                    .user(userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException(USER_NOT_FOUND_ERROR)))
+                    .user(userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(USER_NOT_FOUND_ERROR)))
                     .cafe(cafeRepository.findById(cafeId).orElseThrow(() -> new CafeNotFoundException(CAFE_NOT_FOUND_ERROR)))
                     .build();
 
             favoriteRepository.save(favorite);
         }
 
-        log.info("User {} added cafe {} from favorites", username, cafeId);
+        log.info("User {} added cafe {} from favorites", userId, cafeId);
         return new ToggleFavoriteRes("해당 카페를 즐겨찾기에 추가했습니다.");
     }
 }

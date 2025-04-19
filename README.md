@@ -264,7 +264,7 @@
 <br>
 
 ## 📐 Architecture
-<img width="700" height="350" alt="Image" src="https://github.com/user-attachments/assets/f3a504b2-bfc9-4f5c-ae4c-d7e4587e524d" />
+<img width="1050" height="600" alt="Image" src="https://github.com/user-attachments/assets/f3a504b2-bfc9-4f5c-ae4c-d7e4587e524d" />
 
 ## 🍎 ERD
 ![Image](https://github.com/user-attachments/assets/df2fe555-d17a-484c-9205-02feca0672cc)

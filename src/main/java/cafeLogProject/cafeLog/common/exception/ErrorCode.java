@@ -47,7 +47,8 @@ public enum ErrorCode {
 
     FOLLOW_SELF_ERROR(HttpStatus.BAD_REQUEST, "자기 자신을 팔로우 할 수 없습니다."),
     FOLLOW_USER_NOT_FOUND_ERROR(HttpStatus.NOT_FOUND, "해당 유저를 찾을 수 없습니다."),
-    FOLLOW_CURSOR_EXCEPTION(HttpStatus.BAD_REQUEST, "유효하지 않은 커서입니다.");
+    FOLLOW_CURSOR_EXCEPTION(HttpStatus.BAD_REQUEST, "유효하지 않은 커서입니다."),
+    FOLLOW_NO_MORE_EXCEPTION(HttpStatus.BAD_REQUEST, "리스트를 모두 조회했습니다.");
 
     private final HttpStatus httpStatus;
     private final String message;

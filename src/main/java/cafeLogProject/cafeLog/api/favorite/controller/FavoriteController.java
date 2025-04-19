@@ -24,7 +24,7 @@ public class FavoriteController {
     public ResponseEntity<ToggleFavoriteRes> toggleFavorite(@AuthenticationPrincipal CustomOAuth2User user,
                                                             @RequestBody @Valid ToggleFavoriteReq toggleFavoriteReq) {
 
-        ToggleFavoriteRes toggleFavoriteRes = favoriteService.toggleFavorite(user.getName(), toggleFavoriteReq);
+        ToggleFavoriteRes toggleFavoriteRes = favoriteService.toggleFavorite(user.getUserId(), toggleFavoriteReq);
         return ResponseEntity.ok(toggleFavoriteRes);
     }
 
@@ -32,6 +32,6 @@ public class FavoriteController {
     public ResponseEntity<List<FavoriteCafeInfo>> getMyFavoriteCafeList(@AuthenticationPrincipal CustomOAuth2User user,
                                                                         @RequestParam boolean scraped) {
 
-        return ResponseEntity.ok(favoriteService.getMyFavoriteCafeList(user.getName()));
+        return ResponseEntity.ok(favoriteService.getMyFavoriteCafeList(user.getUserId()));
     }
 }

@@ -23,7 +23,7 @@ public class CafeController {
     public ResponseEntity<CafeInfoRes> getCafeInfo(@PathVariable Long cafeId,
                                                    @AuthenticationPrincipal CustomOAuth2User user) {
 
-        CafeInfoRes cafeInfo = cafeService.getCafeInfo(cafeId, user.getName());
+        CafeInfoRes cafeInfo = cafeService.getCafeInfo(cafeId, user.getUserId());
         return ResponseEntity.ok(cafeInfo);
     }
 

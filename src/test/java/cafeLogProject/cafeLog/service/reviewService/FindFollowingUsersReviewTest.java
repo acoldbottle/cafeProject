@@ -72,7 +72,6 @@ public class FindFollowingUsersReviewTest {
                 .link("링크")
                 .build());
 
-        followService.followUser(follower.getUsername(), following.getId());
 
         Review followingReview = reviewRepository.save(Review.builder()
                 .content("팔로잉한 유저의 리뷰")
@@ -133,7 +132,6 @@ public class FindFollowingUsersReviewTest {
                 .link("링크")
                 .build());
 
-        followService.followUser(follower.getUsername(), following.getId());
 
         // 팔로잉유저가 리뷰 3개 작성 (시간차를 두고)
         Review oldestReview = reviewRepository.save(Review.builder()
@@ -238,7 +236,6 @@ public class FindFollowingUsersReviewTest {
                 .link("링크")
                 .build());
 
-        followService.followUser(follower.getUsername(), following.getId());
 
         // 리뷰 3개 작성 (시간차를 두고)
         Review oldReview = reviewRepository.save(Review.builder()
@@ -316,7 +313,6 @@ public class FindFollowingUsersReviewTest {
                 .link("링크")
                 .build());
 
-        followService.followUser(follower.getUsername(), following.getId());
 
         for (int i = 1; i <= 5; i++) {
             reviewRepository.save(Review.builder()
@@ -369,7 +365,6 @@ public class FindFollowingUsersReviewTest {
                 .nickname("팔로잉")
                 .build());
 
-        followService.followUser(follower.getUsername(), following.getId());
 
         // when
         ShowUserReviewRequest request = ShowUserReviewRequest.builder()
