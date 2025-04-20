@@ -5,6 +5,7 @@ import cafeLogProject.cafeLog.domains.follow.domain.Follow;
 import cafeLogProject.cafeLog.domains.follow.domain.QFollow;
 import cafeLogProject.cafeLog.domains.review.domain.QReview;
 import com.querydsl.core.Tuple;
+import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 
@@ -32,28 +33,33 @@ public class UserRepositoryImpl implements UserRepositoryCustom{
     @Override
     public UserInfoRes getFollowCntAndReviewCnt(UserInfoRes userInfoRes) {
 
-        Long userId = userInfoRes.getUserId();
-        Long followerCnt = queryFactory
-                .select(follow.count())
-                .from(follow)
-                .where(follow.following.id.eq(userId))
-                .fetchOne();
-
-        Long followingCnt = queryFactory
-                .select(follow.count())
-                .from(follow)
-                .where(follow.follower.id.eq(userId))
-                .fetchOne();
-
-        Long reviewCnt = queryFactory
-                .select(review.count())
+        Tuple tuple = queryFactory
+                .select(
+                        JPAExpressions.select(follow.follower.count().intValue())
+                                .from(follow)
+                                .where(follow.following.id.eq(userInfoRes.getUserId())),
+                        JPAExpressions.select(follow.following.count().intValue())
+                                .from(follow)
+                                .where(follow.follower.id.eq(userInfoRes.getUserId())),
+                        review.count().intValue()
+                )
                 .from(review)
-                .where(review.user.id.eq(userId))
-                .fetchOne();
+                .where(review.user.id.eq(userInfoRes.getUserId()))
+                .fetchFirst();
 
-        userInfoRes.setFollower_cnt(followerCnt != null ? followerCnt.intValue() : 0);
-        userInfoRes.setFollowing_cnt(followingCnt != null ? followingCnt.intValue() : 0);
-        userInfoRes.setReview_cnt(reviewCnt != null ? reviewCnt.intValue() : 0);
+        Integer followerCnt = 0;
+        Integer followingCnt = 0;
+        Integer reviewCnt = 0;
+
+        if (tuple != null) {
+            followerCnt = tuple.get(0, Integer.class);
+            followingCnt = tuple.get(1, Integer.class);
+            reviewCnt = tuple.get(2, Integer.class);
+        }
+
+        userInfoRes.setFollower_cnt(followerCnt);
+        userInfoRes.setFollowing_cnt(followingCnt);
+        userInfoRes.setReview_cnt(reviewCnt);
 
         return userInfoRes;
     }
